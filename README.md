@@ -1,7 +1,7 @@
 # EdisonLight
 Lighting control through the Edison board.
 
-##### N.B. Instead of the relay in the projects used the LED. 
+##### N.B. For the demonstration instead of the relay in the projects I used the LED.
 
 * In the "master" branch a version of the light control via light sensor and ultrasonic ranger.
 Additionally, you need to install
