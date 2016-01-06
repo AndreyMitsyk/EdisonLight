@@ -21,13 +21,16 @@ var minimumRange = 4;
 var minimumLight = 2;
 var activateDistance = 70;
 var flag = false;
+var timeout;
 
 // TODO: remove display after debug.
 var display = require('intel-edison-lcd-rgb-backlight-display-helper');
 display.set(2, 16);
 display.setColorFromTwoColors('green', 'yellow', 0.5);
 
-// Sets microseconds delay.
+/*
+ * Sets microseconds delay.
+ */
 function usleep(us) {
     var start = ms.now();
     while (true) {
@@ -37,7 +40,9 @@ function usleep(us) {
     }
 }
 
-// Counts the distance with help of ultrasonic sensor.
+/*
+ * Counts the distance with help of ultrasonic sensor.
+ */
 var ReadSensor = function() {
     var pulseOn, pulseOff;
     var duration, distance;
@@ -68,26 +73,28 @@ var ReadSensor = function() {
     }
 };
 
-// Dirty hack! Resolve this.
-var timeout = new Array();
-
-// Compares the values with the sensors with specified constants.
+/* 
+ * Compares the values with the sensors with specified constants.
+ */
 function CheckValues(light, distance) {
     if (light < minimumLight && distance <= activateDistance) {
-        var temp = setTimeout(function() {
-            LightOn();
-        }, 2000);
-        timeout.push(temp);
+        // If the timeout is reset set a new one.
+        if (!!!timeout) {
+            // The sensor reacts to the change in the distance over 2 seconds.
+            timeout = setTimeout(function() {
+                LightOn();
+            }, 2000);
+        }
         return;
     }
-    if (timeout.length > 0) {
-        for(var i=0; i<timeout.length; i++) {
-            clearTimeout(timeout[i]); 
-        }
-    }
+    // Reset timeout if distance increases.
+    clearTimeout(timeout);
+    timeout = null;
 }
 
-// Activates the relay module.
+/*
+ * Activates the relay module.
+ */
 function LightOn() {
     if (!flag) {
         flag = true;
@@ -100,4 +107,5 @@ function LightOn() {
     }
 }
 
+// Declare interval for the work of ultrasonic sensor.
 setInterval(ReadSensor, 60);
