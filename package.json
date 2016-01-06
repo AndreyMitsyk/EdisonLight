@@ -1,11 +1,13 @@
 {
-  "name": "blankapp",
-  "description": "",
-  "version": "0.0.0",
+  "name": "SmartLight",
+  "description": "Lighting control through the Edison board",
+  "version": "0.5.1",
   "main": "main.js",
   "engines": {
     "node": ">=0.10.0"
   },
   "dependencies": {
+	"microseconds": "latest",
+    "intel-edison-lcd-rgb-backlight-display-helper":"latest"
   }
 }
