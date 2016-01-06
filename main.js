@@ -18,7 +18,7 @@ echoPin.dir(mraa.DIR_IN);
 // Declare variables.
 var maximumRange = 400;
 var minimumRange = 4;
-var minimumLight = 2;
+var minimumLight = 1;
 var activateDistance = 70;
 var flag = false;
 var timeout;
