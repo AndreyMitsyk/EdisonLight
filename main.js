@@ -68,10 +68,22 @@ var ReadSensor = function() {
     }
 };
 
+// Dirty hack! Resolve this.
+var timeout = new Array();
+
 // Compares the values with the sensors with specified constants.
 function CheckValues(light, distance) {
     if (light < minimumLight && distance <= activateDistance) {
-        LightOn();
+        var temp = setTimeout(function() {
+            LightOn();
+        }, 2000);
+        timeout.push(temp);
+        return;
+    }
+    if (timeout.length > 0) {
+        for(var i=0; i<timeout.length; i++) {
+            clearTimeout(timeout[i]); 
+        }
     }
 }
 
@@ -79,6 +91,7 @@ function CheckValues(light, distance) {
 function LightOn() {
     if (!flag) {
         flag = true;
+        // Closes the contact on the wireless controller.
         led.on();
         setTimeout(function() {
             led.off();

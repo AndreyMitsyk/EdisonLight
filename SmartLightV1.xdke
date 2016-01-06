@@ -9,38 +9,38 @@
   "iot-tab": {
     "fileStatus": {
       "icon.png": {
-        "previousModTime": 1452000853679,
-        "modified": 1452000853679,
+        "previousModTime": 1452024919000,
+        "modified": 1452024919000,
         "seen": true,
         "name": "icon.png"
       },
       "main.js": {
-        "previousModTime": 1452017052792,
-        "modified": 1452017052792,
+        "previousModTime": 1452103005600,
+        "modified": 1452103005600,
         "seen": true,
         "name": "main.js"
       },
       "package.json": {
-        "previousModTime": 1452000853679,
-        "modified": 1452000853679,
+        "previousModTime": 1452024919404,
+        "modified": 1452024919404,
         "seen": true,
         "name": "package.json"
       },
       "README.md": {
-        "previousModTime": 1452000853679,
-        "modified": 1452000853679,
+        "previousModTime": 1452024919377,
+        "modified": 1452024919377,
         "seen": true,
         "name": "README.md"
       },
       "SmartLightV1.xdk": {
-        "previousModTime": 1452000853911,
-        "modified": 1452000853911,
+        "previousModTime": 1452024919382,
+        "modified": 1452024919382,
         "seen": true,
         "name": "SmartLightV1.xdk"
       },
       "SmartLightV1.xdke": {
-        "previousModTime": 1452013106014,
-        "modified": 1452013106014,
+        "previousModTime": 1452102990558,
+        "modified": 1452102990558,
         "seen": true,
         "name": "SmartLightV1.xdke"
       },
@@ -49,23 +49,17 @@
         "modified": 1452000853892,
         "seen": true,
         "name": "xdk/project-info.json"
+      },
+      ".gitignore": {
+        "previousModTime": 1452024919372,
+        "modified": 1452024919372,
+        "seen": true,
+        "name": ".gitignore"
       }
     },
     "boardFileStatus": {
-      "icon.png": {
-        "previousModTime": 1452017055213
-      },
       "main.js": {
-        "previousModTime": 1452017055213
-      },
-      "package.json": {
-        "previousModTime": 1452017055213
-      },
-      "README.md": {
-        "previousModTime": 1452017055213
-      },
-      "xdk/project-info.json": {
-        "previousModTime": 1452017055213
+        "previousModTime": 1452103008658
       }
     }
   }
