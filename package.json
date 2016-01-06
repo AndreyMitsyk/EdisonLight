@@ -7,7 +7,7 @@
     "node": ">=0.10.0"
   },
   "dependencies": {
-	"microseconds": "latest",
+    "microseconds": "latest",
     "intel-edison-lcd-rgb-backlight-display-helper":"latest"
   }
 }
