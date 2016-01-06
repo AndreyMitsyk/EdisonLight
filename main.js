@@ -5,7 +5,7 @@
  * hciconfig hci0 up
  */
 
-// Using the bleno module
+// Using the noble module
 var noble = require('noble');
 var display = require('intel-edison-lcd-rgb-backlight-display-helper');
 var groveSensor = require('jsupm_grove');
