@@ -4,10 +4,17 @@
 var mraa = require('mraa');
 var groveSensor = require('jsupm_grove');
 var ms = require('microseconds');
+var display = require('intel-edison-lcd-rgb-backlight-display-helper');
 
 // Declare grove devices.
 var lightSensor = new groveSensor.GroveLight(0);
 var led = new groveSensor.GroveLed(8);
+var button = new groveSensor.GroveButton(4);
+
+// Set display rows/cols.
+display.set(2, 16);
+// Set backlight color from 2 colors and range.
+display.setColorFromTwoColors('green', 'yellow', 0.5);
 
 // Configure ultrasonic sensor.
 var echoPin = new mraa.Gpio(6);
@@ -18,20 +25,15 @@ echoPin.dir(mraa.DIR_IN);
 // Declare variables.
 var maximumRange = 400;
 var minimumRange = 4;
-var minimumLight = 1;
-var activateDistance = 70;
+var minimumLight = 2;
+var activateDistance = 200;
 var flag = false;
 var timeout;
-
-// TODO: remove display after debug.
-var display = require('intel-edison-lcd-rgb-backlight-display-helper');
-display.set(2, 16);
-display.setColorFromTwoColors('green', 'yellow', 0.5);
 
 /*
  * Sets microseconds delay.
  */
-function usleep(us) {
+function Usleep(us) {
     var start = ms.now();
     while (true) {
         if (ms.since(start) > us) {
@@ -41,6 +43,17 @@ function usleep(us) {
 }
 
 /*
+ * Reads the button value and activates the LightOn function.
+ */
+function ReadButtonValue() {
+    if (button.value()) {
+        LightOn();
+    }
+}
+setInterval(ReadButtonValue, 1500);
+
+
+/*
  * Counts the distance with help of ultrasonic sensor.
  */
 var ReadSensor = function() {
@@ -48,9 +61,9 @@ var ReadSensor = function() {
     var duration, distance;
     
     trigPin.write(0);
-    usleep(2);
+    Usleep(2);
     trigPin.write(1);
-    usleep(10);
+    Usleep(10);
     trigPin.write(0);
     
     while (echoPin.read() === 0) {
@@ -63,10 +76,8 @@ var ReadSensor = function() {
     distance = parseInt(duration / 58.2);
     
     if (distance >= maximumRange || distance <= minimumRange) {
-        // TODO: remove display after debug.
         display.write([lightSensor.value() + ' lux', 'Out of range']);
     } else {
-        // TODO: remove display after debug.
         display.write([lightSensor.value() + ' lux', distance + ' cm']);
 
         CheckValues(lightSensor.value(), distance);
@@ -83,7 +94,7 @@ function CheckValues(light, distance) {
             // The sensor reacts to the change in the distance over 2 seconds.
             timeout = setTimeout(function() {
                 LightOn();
-            }, 2000);
+            }, 1000);
         }
         return;
     }
