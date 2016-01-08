@@ -1,13 +1,16 @@
 {
-  "name": "SmartLight",
+  "name": "SmartLightCylon",
   "description": "Lighting control through the Edison board",
-  "version": "0.5.1",
+  "version": "0.1.1",
   "main": "main.js",
   "engines": {
     "node": ">=0.10.0"
   },
   "dependencies": {
     "microseconds": "latest",
-    "intel-edison-lcd-rgb-backlight-display-helper":"latest"
+    "cylon": "latest",
+    "cylon-gpio": "latest",
+    "cylon-i2c": "latest",
+    "cylon-intel-iot": "latest"
   }
 }

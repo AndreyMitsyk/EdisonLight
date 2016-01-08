@@ -1,20 +1,10 @@
 /*jslint node:true, vars:true, bitwise:true, unparam:true */
+"use strict";
 
 // Initialize libraries.
 var mraa = require('mraa');
-var groveSensor = require('jsupm_grove');
-var ms = require('microseconds');
-var display = require('intel-edison-lcd-rgb-backlight-display-helper');
-
-// Declare grove devices.
-var lightSensor = new groveSensor.GroveLight(0);
-var led = new groveSensor.GroveLed(8);
-var button = new groveSensor.GroveButton(4);
-
-// Set display rows/cols.
-display.set(2, 16);
-// Set backlight color from 2 colors and range.
-display.setColorFromTwoColors('green', 'yellow', 0.5);
+var ms = require("microseconds");
+var cylon = require("cylon");
 
 // Configure ultrasonic sensor.
 var echoPin = new mraa.Gpio(6);
@@ -25,98 +15,127 @@ echoPin.dir(mraa.DIR_IN);
 // Declare variables.
 var maximumRange = 400;
 var minimumRange = 4;
-var minimumLight = 2;
+var minimumLight = 50;
 var activateDistance = 200;
 var flag = false;
 var timeout;
 
-/*
- * Sets microseconds delay.
- */
-function Usleep(us) {
-    var start = ms.now();
-    while (true) {
-        if (ms.since(start) > us) {
+cylon.robot({
+    name: "SmartLightCylon",
+    connections: {
+        edison: { adaptor: "intel-iot" }
+    },
+
+    devices: {
+        // Digital sensors.
+        button: { driver: "button", pin: 4, connection: "edison" },
+        led: { driver: "led", pin: 8, connection: "edison" },
+        // Analog sensors.
+        lightSensor: { driver: "analogSensor", pin: 0, connection: "edison" },
+        // I2c devices.
+        screen: { driver: "upm-jhd1313m1", connection: "edison" }
+    },
+
+    // Writes text on the display.
+    writeMessage: function(message, row) {
+        var that = this;
+        var str = message.toString();
+        while (str.length < 16) {
+            str = str + " ";
+        }
+        that.screen.setColor(0, 255, 255);
+        that.screen.setCursor(row, 0);
+        that.screen.write(str);
+    },
+    
+    // Sets microseconds delay.
+    usleep: function(us) {
+        var start = ms.now();
+        while (true) {
+            if (ms.since(start) > us) {
+                return;
+            }
+        }
+    },
+    
+    // Counts the distance with help of ultrasonic sensor.
+    readRange: function() {
+        var that = this;
+        var pulseOn, pulseOff;
+        var duration, distance;
+        
+        trigPin.write(0);
+        that.usleep(2);
+        trigPin.write(1);
+        that.usleep(10);
+        trigPin.write(0);
+
+        while (echoPin.read() === 0) {
+            pulseOff = ms.now();
+        }
+        while (echoPin.read() === 1) {
+            pulseOn = ms.now();
+        }
+
+        duration = pulseOn - pulseOff;
+        distance = parseInt(duration / 58.2);
+        
+        if (distance >= maximumRange || distance <= minimumRange) {
+            that.writeMessage("Out of range", 0);
+            that.writeMessage(that.lightSensor.analogRead(), 1);
+        } else {
+            that.writeMessage(distance + " cm", 0);
+            that.writeMessage(that.lightSensor.analogRead(), 1);
+            that.checkValues(that.lightSensor.analogRead(), distance);
+        }
+    },
+    
+    // Compares the values with the sensors with specified constants.
+    checkValues: function(light, distance) {
+        var that = this;
+        
+        if (light < minimumLight && distance <= activateDistance) {
+            // If the timeout is reset set a new one.
+            if (!!!timeout) {
+                // The sensor reacts to the change in the distance over 2 seconds.
+                timeout = setTimeout(function() {
+                   that.lightOn();
+                }, 1000);
+            }
             return;
         }
-    }
-}
-
-/*
- * Reads the button value and activates the LightOn function.
- */
-function ReadButtonValue() {
-    if (button.value()) {
-        LightOn();
-    }
-}
-setInterval(ReadButtonValue, 1500);
-
-
-/*
- * Counts the distance with help of ultrasonic sensor.
- */
-var ReadSensor = function() {
-    var pulseOn, pulseOff;
-    var duration, distance;
+        // Reset timeout if distance increases.
+        clearTimeout(timeout);
+        timeout = null;
+    },
     
-    trigPin.write(0);
-    Usleep(2);
-    trigPin.write(1);
-    Usleep(10);
-    trigPin.write(0);
-    
-    while (echoPin.read() === 0) {
-        pulseOff = ms.now();
-    }
-    while (echoPin.read() === 1) {
-        pulseOn = ms.now();
-    }
-    duration = pulseOn - pulseOff;
-    distance = parseInt(duration / 58.2);
-    
-    if (distance >= maximumRange || distance <= minimumRange) {
-        display.write([lightSensor.value() + ' lux', 'Out of range']);
-    } else {
-        display.write([lightSensor.value() + ' lux', distance + ' cm']);
-
-        CheckValues(lightSensor.value(), distance);
-    }
-};
-
-/* 
- * Compares the values with the sensors with specified constants.
- */
-function CheckValues(light, distance) {
-    if (light < minimumLight && distance <= activateDistance) {
-        // If the timeout is reset set a new one.
-        if (!!!timeout) {
-            // The sensor reacts to the change in the distance over 2 seconds.
-            timeout = setTimeout(function() {
-                LightOn();
-            }, 1000);
+    // Activates the relay module.
+    lightOn: function() {
+        var that = this;
+        
+        if (!flag) {
+            flag = true;
+            // Closes the contact on the wireless controller.
+            that.led.turnOn();
+            setTimeout(function() {
+                that.led.turnOff();
+                flag = false;
+            }, 500);
         }
-        return;
+    },
+    
+    // Main function.
+    work: function() {
+        var that = this;
+        
+        // Button press event.
+        that.button.on('push', function() {
+            that.lightOn();
+        });
+        
+        // Interval for the work of ultrasonic sensor.
+        setInterval(function() {
+            that.readRange();
+        }, 60);
     }
-    // Reset timeout if distance increases.
-    clearTimeout(timeout);
-    timeout = null;
-}
-
-/*
- * Activates the relay module.
- */
-function LightOn() {
-    if (!flag) {
-        flag = true;
-        // Closes the contact on the wireless controller.
-        led.on();
-        setTimeout(function() {
-            led.off();
-            flag = false;
-        }, 500);
-    }
-}
-
-// Declare interval for the work of ultrasonic sensor.
-setInterval(ReadSensor, 60);
+}).start();
