@@ -2,15 +2,8 @@
 "use strict";
 
 // Initialize libraries.
-var mraa = require('mraa');
 var ms = require("microseconds");
 var cylon = require("cylon");
-
-// Configure ultrasonic sensor.
-var echoPin = new mraa.Gpio(6);
-var trigPin = new mraa.Gpio(7);
-trigPin.dir(mraa.DIR_OUT);
-echoPin.dir(mraa.DIR_IN);
 
 // Declare variables.
 var maximumRange = 400;
@@ -33,7 +26,10 @@ cylon.robot({
         // Analog sensors.
         lightSensor: { driver: "analogSensor", pin: 0, connection: "edison" },
         // I2c devices.
-        screen: { driver: "upm-jhd1313m1", connection: "edison" }
+        screen: { driver: "upm-jhd1313m1", connection: "edison" },
+        // Ultrasonic pins.
+        echoPin: { driver: 'direct-pin', pin: 5 }, //6
+        trigPin: { driver: 'direct-pin', pin: 2 } //7
     },
 
     // Writes text on the display.
@@ -64,20 +60,20 @@ cylon.robot({
         var pulseOn, pulseOff;
         var duration, distance;
         
-        trigPin.write(0);
+        that.trigPin.digitalWrite(0);
         that.usleep(2);
-        trigPin.write(1);
+        that.trigPin.digitalWrite(1);
         that.usleep(10);
-        trigPin.write(0);
-
-        while (echoPin.read() === 0) {
+        that.trigPin.digitalWrite(0);
+        
+       /* while (echoPin.read() === 0) {
             pulseOff = ms.now();
         }
         while (echoPin.read() === 1) {
             pulseOn = ms.now();
-        }
+        }*/
 
-        duration = pulseOn - pulseOff;
+        duration = pulseOn - pulseOff; // 200
         distance = parseInt(duration / 58.2);
         
         if (distance >= maximumRange || distance <= minimumRange) {
@@ -130,6 +126,7 @@ cylon.robot({
         
         // Button press event.
         that.button.on('push', function() {
+            console.log(that.echoPin.digitalRead());
             that.lightOn();
         });
         
