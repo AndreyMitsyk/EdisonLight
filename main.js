@@ -124,9 +124,12 @@ cylon.robot({
     work: function() {
         var that = this;
         
+        that.echoPin.digitalRead(function(a, val) { 
+            console.log(val);
+        });
+        
         // Button press event.
         that.button.on('push', function() {
-            console.log(that.echoPin.digitalRead());
             that.lightOn();
         });
         
