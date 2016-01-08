@@ -15,7 +15,7 @@ echoPin.dir(mraa.DIR_IN);
 // Declare variables.
 var maximumRange = 400;
 var minimumRange = 4;
-var minimumLight = 100;
+var minimumLight = 50;
 var activateDistance = 200;
 var flag = false;
 var timeout;
@@ -27,12 +27,12 @@ cylon.robot({
     },
 
     devices: {
-        // digital sensors
+        // Digital sensors.
         button: { driver: "button", pin: 4, connection: "edison" },
         led: { driver: "led", pin: 8, connection: "edison" },
-        // analog sensors
+        // Analog sensors.
         lightSensor: { driver: "analogSensor", pin: 0, connection: "edison" },
-        // i2c devices
+        // I2c devices.
         screen: { driver: "upm-jhd1313m1", connection: "edison" }
     },
 
