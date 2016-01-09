@@ -29,23 +29,9 @@ cylon.robot({
     devices: {
         // Digital sensors.
         button: { driver: "button", pin: 4, connection: "edison" },
-        led: { driver: "led", pin: 8, connection: "edison" },
+        relay: { driver: 'relay', pin: 8, type: "open" },
         // Analog sensors.
-        lightSensor: { driver: "analogSensor", pin: 0, connection: "edison" },
-        // I2c devices.
-        screen: { driver: "upm-jhd1313m1", connection: "edison" }
-    },
-
-    // Writes text on the display.
-    writeMessage: function(message, row) {
-        var that = this;
-        var str = message.toString();
-        while (str.length < 16) {
-            str = str + " ";
-        }
-        that.screen.setColor(0, 255, 255);
-        that.screen.setCursor(row, 0);
-        that.screen.write(str);
+        lightSensor: { driver: "analogSensor", pin: 0, connection: "edison" }
     },
     
     // Sets microseconds delay.
@@ -80,12 +66,7 @@ cylon.robot({
         duration = pulseOn - pulseOff;
         distance = parseInt(duration / 58.2);
         
-        if (distance >= maximumRange || distance <= minimumRange) {
-            that.writeMessage("Out of range", 0);
-            that.writeMessage(that.lightSensor.analogRead(), 1);
-        } else {
-            that.writeMessage(distance + " cm", 0);
-            that.writeMessage(that.lightSensor.analogRead(), 1);
+        if (distance < maximumRange && distance > minimumRange) {
             that.checkValues(that.lightSensor.analogRead(), distance);
         }
     },
@@ -100,7 +81,7 @@ cylon.robot({
                 // The sensor reacts to the change in the distance over 2 seconds.
                 timeout = setTimeout(function() {
                    that.lightOn();
-                }, 1000);
+                }, 500);
             }
             return;
         }
@@ -116,11 +97,11 @@ cylon.robot({
         if (!flag) {
             flag = true;
             // Closes the contact on the wireless controller.
-            that.led.turnOn();
+            that.relay.turnOn();
             setTimeout(function() {
-                that.led.turnOff();
+                that.relay.turnOff();
                 flag = false;
-            }, 500);
+            }, 200);
         }
     },
     
