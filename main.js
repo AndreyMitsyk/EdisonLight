@@ -2,7 +2,7 @@
 "use strict";
 
 // Initialize libraries.
-var mraa = require('mraa');
+var mraa = require("mraa");
 var ms = require("microseconds");
 var cylon = require("cylon");
 
@@ -29,7 +29,7 @@ cylon.robot({
     devices: {
         // Digital sensors.
         button: { driver: "button", pin: 4, connection: "edison" },
-        relay: { driver: 'relay', pin: 8, type: "open" },
+        relay: { driver: "relay", pin: 8, type: "open" },
         // Analog sensors.
         lightSensor: { driver: "analogSensor", pin: 0, connection: "edison" }
     },
@@ -110,7 +110,7 @@ cylon.robot({
         var that = this;
         
         // Button press event.
-        that.button.on('push', function() {
+        that.button.on("push", function() {
             that.lightOn();
         });
         
